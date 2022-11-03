@@ -110,7 +110,7 @@ impl Emu{
         op
     }
 
-    pub fn tick_timer(&mut self){
+    pub fn tick_timers(&mut self){
         if self.dt > 0 {
             self.dt -= 1;
         }
@@ -143,11 +143,31 @@ impl Emu{
             //CLS
             (0, 0, 0xE, 0) => {
                 self.screen = [false; SCREEN_WIDTH * SCREEN_HEIGHT];
-            }
+            },
+            
+            //RET
+            (0, 0, 0xE, 0xE) => {
+                let ret_addr =self.pop();
+                self.pc = ret_addr;
+            },
+
+            //warning?
             (_, _, _, _) => unimplemented!("Unimplemented opcode: {}",op),
         }
 
-        }
+    }
+
+    
+    pub fn load(&mut self, data: &[u8]){
+        let start = START_ADDR as usize;
+        let end = (START_ADDR as usize) + data.len();
+        self.ram[start..end].copy_from_slice(data);
+    }
+
+    pub fn get_display(&self) -> &[bool] {
+        &self.screen
+    }
+    
     
 
 }
